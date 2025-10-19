@@ -80,7 +80,7 @@ typings/
 .dynamodb/
 
 # Npm Lock files
-package-lock.json
+#package-lock.json
 
 # Dist
 dist/
