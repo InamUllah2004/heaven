@@ -18,7 +18,10 @@
 // 	root: "./public/data/"
 // });
 // */
-/// Run.js - Entry point for Heroku deployment
+
+
+
+
 const express = require("express");
 const satellite = require("./src/satellite");
 const iridium = require("./src/iridium");
@@ -27,25 +30,43 @@ const app = express();
 app.use(express.static("public")); // serve any scraped data or HTML files
 
 // Run your scraping task once on startup
-satellite.getTable({
-  target: 25544,
-  pages: 4,
-  root: "./public/data/"
-});
+(async () => {
+  try {
+    await satellite.getTable({
+      target: 25544,
+      pages: 4,
+      root: "./public/data/"
+    });
+    console.log("Initial scraping completed");
+  } catch (error) {
+    console.error("Error during initial scraping:", error.message);
+  }
+})();
 
 // Optional: route to trigger scraping manually
-app.get("/scrape", (req, res) => {
-  satellite.getTable({
-    target: 25544,
-    pages: 4,
-    root: "./public/data/"
-  });
-  res.send("Scraping started...");
+app.get("/scrape", async (req, res) => {
+  try {
+    await satellite.getTable({
+      target: 25544,
+      pages: 4,
+      root: "./public/data/"
+    });
+    res.send("Scraping completed successfully!");
+  } catch (error) {
+    console.error("Error during manual scraping:", error.message);
+    res.status(500).send("Error during scraping: " + error.message);
+  }
 });
 
 // Default route
 app.get("/", (req, res) => {
-  res.send("🚀 Heavens Above Scraper running successfully on Heroku!");
+  res.send("🚀 Heavens Above Scraper running successfully!");
+});
+
+// Handle errors
+app.use((err, req, res, next) => {
+  console.error("Unhandled error:", err);
+  res.status(500).send("Internal server error");
 });
 
 // Heroku sets PORT dynamically
