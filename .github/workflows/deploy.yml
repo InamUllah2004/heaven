@@ -2,28 +2,35 @@ name: Deploy to Heroku
 
 on:
   push:
-    branches:
-      - main  # deploy whenever you push to main
+    branches: [ main ]
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - name:  Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name:  Setup Node.js
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: 18
 
-      - name:  Install dependencies
-        run: npm install
+      - name: Install dependencies
+        run: npm ci
 
-      - name:  Deploy to Heroku
+      #  This is the fix — install Heroku CLI manually
+      - name: Install Heroku CLI
+        run: |
+          curl https://cli-assets.heroku.com/install.sh | sh
+          heroku --version
+
+      #  Deploy to Heroku
+      - name: Deploy to Heroku
         uses: akhileshns/heroku-deploy@v3.12.14
         with:
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
-          heroku_app_name: "heavens-above-scraper"
-          heroku_email: "<YOUR_HEROKU_EMAIL>"
+          heroku_app_name: heavens-above-scraper
+          heroku_email: ${{ secrets.HEROKU_EMAIL }}
          
