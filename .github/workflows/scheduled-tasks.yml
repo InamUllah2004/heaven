@@ -3,7 +3,7 @@ name: Scheduled Data Scraper and Backup
 on:
   schedule:
     # Runs every minute
-    - cron: '* * * * *'
+    #- cron: '* * * * *'
   workflow_dispatch:  # allows you to trigger it manually from Actions tab
 
 jobs:
