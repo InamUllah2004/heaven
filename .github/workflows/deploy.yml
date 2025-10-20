@@ -1,0 +1,29 @@
+name: Deploy to Heroku
+
+on:
+  push:
+    branches:
+      - main  # deploy whenever you push to main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name:  Checkout code
+        uses: actions/checkout@v4
+
+      - name:  Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name:  Install dependencies
+        run: npm install
+
+      - name:  Deploy to Heroku
+        uses: akhileshns/heroku-deploy@v3.12.14
+        with:
+          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+          heroku_app_name: "heavens-above-scraper"
+          heroku_email: "<YOUR_HEROKU_EMAIL>"
+         
