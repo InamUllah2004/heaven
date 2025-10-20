@@ -20,8 +20,6 @@
 // */
 
 
-
-
 const express = require("express");
 const satellite = require("./src/satellite");
 const iridium = require("./src/iridium");

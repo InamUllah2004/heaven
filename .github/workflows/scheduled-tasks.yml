@@ -1,0 +1,54 @@
+name: Scheduled Data Scraper and Backup
+
+on:
+  schedule:
+    # Runs every minute
+    - cron: '* * * * *'
+  workflow_dispatch:  # allows you to trigger it manually from Actions tab
+
+jobs:
+  run-scraper:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout repository
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Step 2: Set up Node.js environment
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      # Step 3: Install dependencies
+      - name: Install dependencies
+        run: npm install
+
+      # Step 4: Run the scraper script
+      - name: Run data scraper
+        run: node run.js
+
+      # Step 5: Create backup ZIP file of scraped data
+      - name: Create data backup ZIP
+        run: |
+          mkdir -p backups
+          zip -r backups/data-backup-${{ github.run_id }}.zip public/data || echo "No data folder found"
+
+      # Step 6: Upload scraped data as artifact
+      - name: Upload scraped data
+        uses: actions/upload-artifact@v4
+        with:
+          name: scraped-data-${{ github.run_id }}
+          path: public/data
+
+      # Step 7: Upload backup ZIP as artifact
+      - name: Upload data backup
+        uses: actions/upload-artifact@v4
+        with:
+          name: data-backup-${{ github.run_id }}
+          path: backups/data-backup-${{ github.run_id }}.zip
+
+      # Step 8: Log completion message
+      - name: Job complete
+        run: echo " Scheduled scrape and backup completed successfully at $(date)"
